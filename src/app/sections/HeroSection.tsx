@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { motion, useMotionValue, useTransform } from 'framer-motion'
 import MagneticButton from '@/components/MagneticButton'
+import JerseyCardStack from '@/components/JerseyCardStack'
 
 /* ── Flow-line canvas ─────────────────────────────── */
 function FlowCanvas() {
@@ -253,34 +254,15 @@ export default function HeroSection() {
           </motion.div>
         </div>
 
-        {/* RIGHT — floating jersey */}
+        {/* RIGHT — floating jersey stack */}
         <motion.div
-          className="flex-1 flex items-center justify-center"
+          className="flex-1 flex items-center justify-center relative w-full h-full"
           initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 2.8, duration: 1, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div
-            ref={jerseyRef}
-            className="relative w-[min(420px,42vw)] aspect-[3/4] animate-float transition-transform duration-300"
-          >
-            {/* Glow */}
-            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-[#b6f542]/20 blur-2xl rounded-full" />
-
-            <Image
-              src="/assets/jersey_hero.png"
-              alt="Featured Football Jersey"
-              fill
-              priority
-              className="object-contain drop-shadow-[0_40px_80px_rgba(0,0,0,0.7)]"
-              sizes="(max-width: 768px) 60vw, 42vw"
-            />
-
-            {/* Badge */}
-            <div className="absolute top-6 -right-4 flex flex-col items-center bg-[#b6f542] text-black text-[9px] font-black tracking-[0.12em] uppercase px-3.5 py-2.5 rounded gap-0.5 shadow-[0_8px_24px_rgba(182,245,66,0.4)]">
-              <span>NEW DROP</span>
-              <span>AW 2024</span>
-            </div>
+          <div className="relative flex items-center justify-center lg:justify-end lg:pr-16 2xl:pr-32 w-full h-full perspective-[1200px]">
+            <JerseyCardStack />
           </div>
         </motion.div>
       </div>

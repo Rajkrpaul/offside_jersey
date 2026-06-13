@@ -1,66 +1,66 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 
 export default function CursorFollower() {
-  const cursorX = useMotionValue(-100)
-  const cursorY = useMotionValue(-100)
+  const mouseX = useMotionValue(-100)
+  const mouseY = useMotionValue(-100)
 
-  const springConfig = { damping: 25, stiffness: 200, mass: 0.5 }
-  const ringX = useSpring(cursorX, { damping: 20, stiffness: 150 })
-  const ringY = useSpring(cursorY, { damping: 20, stiffness: 150 })
-
-  const dotRef = useRef<HTMLDivElement>(null)
-  const ringRef = useRef<HTMLDivElement>(null)
+  /* Ring follows with spring — slightly behind the dot */
+  const ringX = useSpring(mouseX, { stiffness: 140, damping: 18, mass: 0.6 })
+  const ringY = useSpring(mouseY, { stiffness: 140, damping: 18, mass: 0.6 })
 
   useEffect(() => {
     const move = (e: MouseEvent) => {
-      cursorX.set(e.clientX)
-      cursorY.set(e.clientY)
+      mouseX.set(e.clientX)
+      mouseY.set(e.clientY)
     }
-
-    const onEnter = () => {
-      dotRef.current?.classList.add('scale-0')
-      ringRef.current?.classList.add('!w-16', '!h-16', '!border-[--color-neon]')
-    }
-    const onLeave = () => {
-      dotRef.current?.classList.remove('scale-0')
-      ringRef.current?.classList.remove('!w-16', '!h-16', '!border-[--color-neon]')
-    }
-
-    window.addEventListener('mousemove', move)
-
-    const hoverEls = document.querySelectorAll(
-      'a, button, [data-cursor], .product-card, .bento-card, input'
-    )
-    hoverEls.forEach((el) => {
-      el.addEventListener('mouseenter', onEnter)
-      el.addEventListener('mouseleave', onLeave)
-    })
-
-    return () => {
-      window.removeEventListener('mousemove', move)
-      hoverEls.forEach((el) => {
-        el.removeEventListener('mouseenter', onEnter)
-        el.removeEventListener('mouseleave', onLeave)
-      })
-    }
-  }, [cursorX, cursorY])
+    window.addEventListener('mousemove', move, { passive: true })
+    return () => window.removeEventListener('mousemove', move)
+  }, [mouseX, mouseY])
 
   return (
     <>
-      {/* Dot */}
+      {/*
+       * DOT — neon green, always visible on any background color.
+       * No mix-blend-mode so it never disappears on white sections.
+       */}
       <motion.div
-        ref={dotRef}
-        className="fixed top-0 left-0 w-2 h-2 rounded-full bg-[#0a0a0a] pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 mix-blend-difference transition-transform duration-200"
-        style={{ x: cursorX, y: cursorY }}
+        aria-hidden
+        className="fixed top-0 left-0 pointer-events-none z-[9999]"
+        style={{
+          x: mouseX,
+          y: mouseY,
+          translateX: '-50%',
+          translateY: '-50%',
+          width: 9,
+          height: 9,
+          borderRadius: '50%',
+          background: '#b6f542',
+          boxShadow: '0 0 0 1.5px rgba(0,0,0,0.25), 0 0 8px rgba(182,245,66,0.55)',
+        }}
       />
-      {/* Ring */}
+
+      {/*
+       * RING — offset-ring with a dual-tone outline so it shows on
+       * both white (dark stroke) and dark (white glow) sections.
+       */}
       <motion.div
-        ref={ringRef}
-        className="fixed top-0 left-0 w-9 h-9 rounded-full border border-black/30 pointer-events-none z-[9998] -translate-x-1/2 -translate-y-1/2 transition-all duration-300"
-        style={{ x: ringX, y: ringY }}
+        aria-hidden
+        className="fixed top-0 left-0 pointer-events-none z-[9998]"
+        style={{
+          x: ringX,
+          y: ringY,
+          translateX: '-50%',
+          translateY: '-50%',
+          width: 36,
+          height: 36,
+          borderRadius: '50%',
+          border: '1.5px solid rgba(10,10,10,0.35)',
+          outline: '1.5px solid rgba(255,255,255,0.18)',
+          outlineOffset: '-1px',
+        }}
       />
     </>
   )
