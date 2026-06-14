@@ -1,112 +1,287 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import ScrollReveal from '@/components/ScrollReveal'
 
-const eras = [
-  { id: 'e90s',    year: '90s',  label: '1990s Classics',    desc: 'The golden era of kits',            count: '64 Kits',   accent: '#c8a96e', size: 'large'  },
-  { id: 'e2000s',  year: '00s',  label: '2000s Icons',       desc: 'Peak Galácticos era',               count: '88 Kits',   accent: '#a8b5c8', size: 'wide'   },
-  { id: 'e2010s',  year: '10s',  label: '2010s Dominance',   desc: 'Barça, Madrid & beyond',            count: '96 Kits',   accent: '#8fb8a8', size: 'tall'   },
-  { id: 'ewc',     year: 'WC',   label: 'World Cup Legends', desc: 'Historic tournament kits',          count: '120+ Kits', accent: '#d4af37', size: 'medium' },
-  { id: 'eucl',    year: 'UCL',  label: 'Champions League',  desc: 'The biggest nights in football',    count: '72 Kits',   accent: '#7c9ab5', size: 'small'  },
-  { id: 'enat',    year: 'NATL', label: 'National Teams',    desc: '56 countries represented',          count: '210 Kits',  accent: '#b5a07c', size: 'large2' },
-  { id: 'eretro',  year: 'RETRO',label: 'Retro Kits',        desc: 'Limited vintage pieces',            count: '38 Kits',   accent: '#c88a6e', size: 'street' },
-]
-
-const sizeClasses: Record<string, string> = {
-  large:  'md:col-span-1 md:row-span-2 min-h-[320px]',
-  wide:   'md:col-span-2 md:row-span-1 min-h-[240px]',
-  tall:   'md:col-span-1 md:row-span-2 min-h-[320px]',
-  medium: 'md:col-span-1 md:row-span-1 min-h-[220px]',
-  small:  'md:col-span-1 md:row-span-1 min-h-[200px]',
-  large2: 'md:col-span-1 md:row-span-1 min-h-[220px]',
-  street: 'md:col-span-2 md:row-span-1 min-h-[200px]',
+/* ─── Cycling photo hook ─────────────────────────────────────────── */
+function useCycle(imgs: string[], interval = 3600, startOffset = 0) {
+  const [idx, setIdx] = useState(0)
+  useEffect(() => {
+    if (imgs.length <= 1) return
+    const t = setTimeout(() => {
+      const id = setInterval(() => setIdx((v) => (v + 1) % imgs.length), interval)
+      return () => clearInterval(id)
+    }, startOffset)
+    return () => clearTimeout(t)
+  }, [imgs, interval, startOffset])
+  return idx
 }
 
+/* ─── Arrow Button ───────────────────────────────────────────────── */
+function ArrowBtn() {
+  return (
+    <div className="w-8 h-8 rounded-full border border-[#0a0a0a] flex items-center justify-center group-hover:bg-[#0a0a0a] transition-colors duration-300 mt-auto">
+      <svg
+        width="13"
+        height="13"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#0a0a0a"
+        strokeWidth="2.5"
+        className="group-hover:stroke-white transition-colors duration-300"
+      >
+        <path d="M5 12h14M12 5l7 7-7 7" />
+      </svg>
+    </div>
+  )
+}
+
+/* ─── Base Card Component ────────────────────────────────────────── */
+interface CardProps {
+  eraLabel?: string
+  title: string
+  subtitle: string
+  imgs?: string[]
+  img?: string
+  bgClass: string
+  heightClass: string
+  imageAlign?: 'logo' | 'right-blend' | 'bottom-right-blend' | 'cover-blend'
+  imgStyles?: React.CSSProperties
+  interval?: number
+  startOffset?: number
+}
+
+function EraCard({
+  eraLabel,
+  title,
+  subtitle,
+  imgs,
+  img,
+  bgClass,
+  heightClass,
+  imageAlign = 'right-blend',
+  imgStyles,
+  interval = 3500,
+  startOffset = 0,
+}: CardProps) {
+  const isBlend = imageAlign.includes('blend')
+  const isLogo = imageAlign === 'logo'
+  const isCover = imageAlign === 'cover-blend'
+
+  // Normalize single image to array for cycling logic (which stops if length is 1)
+  const imageList = imgs || (img ? [img] : [])
+  const idx = useCycle(imageList, interval, startOffset)
+
+  return (
+    <motion.div
+      className={`relative rounded-[16px] overflow-hidden cursor-pointer group flex-1 flex flex-col p-6 ${bgClass} ${heightClass}`}
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ scale: 1.015 }}
+    >
+      {/* Background/Foreground Image(s) */}
+      <AnimatePresence initial={false}>
+        {imageList.length > 0 && (
+          <motion.img
+            key={idx}
+            src={imageList[idx]}
+            alt=""
+            className={`absolute pointer-events-none ${
+              isLogo
+                ? 'right-6 top-1/2 -translate-y-1/2 w-[40%] h-auto max-h-[60%] object-contain object-right'
+                : isCover
+                ? 'inset-y-0 right-0 w-[80%] h-full object-cover object-right'
+                : 'inset-y-0 right-0 w-[70%] h-full object-cover object-right'
+            }`}
+            initial={imageList.length > 1 ? { opacity: 0 } : false}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            style={{
+              maskImage: isBlend
+                ? 'linear-gradient(to left, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)'
+                : 'none',
+              WebkitMaskImage: isBlend
+                ? 'linear-gradient(to left, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)'
+                : 'none',
+              ...imgStyles,
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Top-left Label */}
+      {eraLabel && (
+        <span className="text-[10px] tracking-[0.15em] font-semibold text-[#0a0a0a]/40 mb-auto relative z-10">
+          {eraLabel}
+        </span>
+      )}
+
+      {/* Text Content */}
+      <div className={`relative z-10 mt-auto flex flex-col justify-end ${eraLabel ? '' : 'h-full'}`}>
+        <h3 className="text-[clamp(18px,2vw,32px)] font-black tracking-tight leading-[1.05] text-[#0a0a0a] mb-1.5 w-1/2">
+          {title.split('\\n').map((line, i) => (
+            <span key={i} className="block">
+              {line}
+            </span>
+          ))}
+        </h3>
+        <p className="text-[10px] tracking-[0.1em] font-bold uppercase text-[#0a0a0a]/50 mb-4">
+          {subtitle}
+        </p>
+        <ArrowBtn />
+      </div>
+    </motion.div>
+  )
+}
+
+/* ─── Section Layout ─────────────────────────────────────────────── */
 export default function EraSection() {
   return (
-    <section id="era" className="py-32 px-6 md:px-16 bg-[#f5f5f5]">
-      <ScrollReveal className="text-center mb-20">
-        <span className="block text-xs tracking-[0.2em] uppercase text-gray-400 mb-4">
-          02 — Eras
+    <section id="era" className="bg-[#FFFFFF] py-[48px] px-[40px]">
+      
+      {/* ── Section Header ── */}
+      <ScrollReveal className="text-center mb-[48px]">
+        <span className="block text-[11px] tracking-[0.25em] uppercase text-gray-400 font-semibold mb-4">
+          02 — ERAS
         </span>
-        <h2 className="text-[clamp(48px,6vw,90px)] font-black leading-[0.92] tracking-tight text-[#0a0a0a]">
-          Shop By{' '}
-          <em className="font-normal" style={{ fontFamily: 'DM Serif Display, serif' }}>
-            Era
-          </em>
+        <h2 className="text-[clamp(40px,5vw,72px)] font-black leading-[0.9] tracking-tight text-[#0a0a0a]">
+          Shop By <em className="font-normal italic" style={{ fontFamily: 'DM Serif Display, serif' }}>Era</em>
         </h2>
-        <p className="text-lg text-gray-400 mt-5 max-w-md mx-auto">
+        <p className="text-[15px] text-gray-500 mt-4 tracking-wide font-light">
           Football through time — from the golden age to modern dominance.
         </p>
       </ScrollReveal>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 md:grid-rows-3 gap-4">
-        {eras.map((era, i) => (
-          <ScrollReveal
-            key={era.id}
-            delay={i * 0.07}
-            direction={i % 2 === 0 ? 'left' : 'right'}
-            className={`era-card ${sizeClasses[era.size]} relative rounded-2xl overflow-hidden bg-white group cursor-pointer min-h-[180px] flex flex-col justify-end p-8`}
-          >
-            {/* Accent wash */}
-            <motion.div
-              className="absolute inset-0"
-              style={{ background: `linear-gradient(135deg, ${era.accent}22 0%, transparent 60%)` }}
-              whileHover={{ opacity: 2 }}
-              initial={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-            />
+      {/* ── Flexbox Bento Layout ── */}
+      <div className="w-full max-w-[1500px] mx-auto flex flex-col gap-[12px]">
+        
+        {/* ROW 1 (3 items) */}
+        <div className="flex flex-col md:flex-row gap-[12px]">
+          <EraCard
+            eraLabel="90s — 00s"
+            title="1990s\nClassics"
+            subtitle="64 KITS"
+            imgs={['/assets/legends/90s1.jpg', '/assets/legends/90s2.jpg', '/assets/legends/90s3.jpg']}
+            bgClass="bg-[#f8f5eb]"
+            heightClass="h-[340px]"
+            imageAlign="cover-blend"
+            interval={3600}
+            startOffset={0}
+          />
+          <EraCard
+            eraLabel="00s — 10s"
+            title="2000s\nIcons"
+            subtitle="98 KITS"
+            imgs={['/assets/legends/2000s1.jpg', '/assets/legends/2000s2.jpg', '/assets/legends/2000s3.jpg']}
+            bgClass="bg-[#f0f2fa]"
+            heightClass="h-[340px]"
+            imageAlign="cover-blend"
+            interval={3800}
+            startOffset={500}
+          />
+          <EraCard
+            eraLabel="10s — 20s"
+            title="2010s\nDominance"
+            subtitle="96 KITS"
+            imgs={['/assets/legends/2010s1.jpg', '/assets/legends/2010s2.jpg', '/assets/legends/2010s3.jpg']}
+            bgClass="bg-[#eaf5eb]"
+            heightClass="h-[340px]"
+            imageAlign="cover-blend"
+            interval={4000}
+            startOffset={1200}
+          />
+        </div>
 
-            {/* Scale on hover */}
-            <motion.div
-              className="absolute inset-0"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            />
+        {/* ROW 2 (5 items) */}
+        <div className="flex flex-col md:flex-row gap-[12px]">
+          <EraCard
+            title="Premier\nLeague"
+            subtitle="140+ KITS"
+            img="/assets/legends/premier league logo.png"
+            bgClass="bg-[#f7f0fa]"
+            heightClass="h-[200px]"
+            imageAlign="logo"
+            imgStyles={{ opacity: 0.9 }}
+          />
+          <EraCard
+            title="LaLiga"
+            subtitle="120+ KITS"
+            img="/assets/legends/laliga logo.png"
+            bgClass="bg-[#fffbf5]"
+            heightClass="h-[200px]"
+            imageAlign="logo"
+            imgStyles={{ opacity: 0.9 }}
+          />
+          <EraCard
+            title="Bundesliga"
+            subtitle="90+ KITS"
+            img="/assets/legends/bundesliga logo.jpg"
+            bgClass="bg-[#fcf0f2]"
+            heightClass="h-[200px]"
+            imageAlign="logo"
+            imgStyles={{ mixBlendMode: 'multiply' }}
+          />
+          <EraCard
+            title="Serie A"
+            subtitle="90+ KITS"
+            img="/assets/legends/serie a logo.png"
+            bgClass="bg-[#f0f6fc]"
+            heightClass="h-[200px]"
+            imageAlign="logo"
+            imgStyles={{ opacity: 0.9 }}
+          />
+          <EraCard
+            title="Champions\nLeague"
+            subtitle="72+ KITS"
+            img="/assets/legends/champions league logo.png"
+            bgClass="bg-[#f0f3f5]"
+            heightClass="h-[200px]"
+            imageAlign="logo"
+            imgStyles={{ opacity: 0.9, mixBlendMode: 'multiply' }}
+          />
+        </div>
 
-            {/* Year label */}
-            <span className="absolute top-6 right-6 text-[11px] font-bold tracking-[0.2em] uppercase text-gray-300">
-              {era.year}
-            </span>
+        {/* ROW 3 (2 items) */}
+        <div className="flex flex-col md:flex-row gap-[12px]">
+          <EraCard
+            eraLabel="30s — 50s"
+            title="World Cup\nLegends"
+            subtitle="120+ KITS"
+            img="/assets/legends/world cup eras.jpg"
+            bgClass="bg-[#fff8e3]"
+            heightClass="h-[300px]"
+            imageAlign="cover-blend"
+            imgStyles={{ backgroundPosition: 'center' }}
+          />
+          <EraCard
+            eraLabel="All Era"
+            title="National\nTeams"
+            subtitle="210+ KITS"
+            img="/assets/legends/national teams.jpg"
+            bgClass="bg-[#f2f2f2]"
+            heightClass="h-[300px]"
+            imageAlign="cover-blend"
+            imgStyles={{ width: '65%' }}
+          />
+        </div>
 
-            {/* Content */}
-            <div className="relative z-10">
-              <h3 className="text-[clamp(20px,2.5vw,36px)] font-black tracking-tight text-[#0a0a0a] leading-[1.1] mb-2 group-hover:text-[#0a0a0a]">
-                {era.label}
-              </h3>
+        {/* ROW 4 (1 item) */}
+        <div className="flex flex-col md:flex-row gap-[12px]">
+          <EraCard
+            eraLabel="Classic Collections"
+            title="Retro Kits"
+            subtitle="38 KITS"
+            img="/assets/legends/retro jerseys.jpg"
+            bgClass="bg-[#f5f4ef]"
+            heightClass="h-[180px]"
+            imageAlign="right-blend"
+          />
+        </div>
 
-              <motion.p
-                className="text-sm text-gray-400 mb-4"
-                initial={{ opacity: 0, y: 8 }}
-                whileHover={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {era.desc}
-              </motion.p>
-
-              <span className="inline-block px-3.5 py-1.5 rounded-full bg-gray-100 text-[11px] font-semibold tracking-[0.08em] uppercase text-gray-400">
-                {era.count}
-              </span>
-            </div>
-
-            {/* Hover border */}
-            <motion.div
-              className="absolute inset-0 rounded-2xl border border-transparent pointer-events-none"
-              whileHover={{ borderColor: `${era.accent}60` }}
-              transition={{ duration: 0.3 }}
-            />
-
-            {/* Top accent bar */}
-            <motion.div
-              className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
-              style={{ background: `linear-gradient(90deg, ${era.accent}, transparent)` }}
-              initial={{ scaleX: 0, transformOrigin: 'left' }}
-              whileHover={{ scaleX: 1 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            />
-          </ScrollReveal>
-        ))}
       </div>
     </section>
   )
