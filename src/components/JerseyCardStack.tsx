@@ -4,7 +4,6 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 
-/* ─── Types & data ─────────────────────────────────────────────────── */
 const EASE = [0.22, 1, 0.36, 1] as const
 
 interface Jersey {
@@ -13,200 +12,199 @@ interface Jersey {
   club: string
   kit: string
   year: string
-  tag: string
   img: string
 }
 
 const JERSEYS: Jersey[] = [
-  { id: 0, player: 'Ronaldinho',  club: 'Brazil 2002',  kit: 'Away Kit',  year: '2002', tag: 'WC Champ.',   img: '/assets/jersey_product3.png' },
-  { id: 1, player: 'C. Ronaldo',  club: 'Man United',   kit: 'Home Kit',  year: '2008', tag: 'UCL Winner',  img: '/assets/jersey_product1.png' },
-  { id: 2, player: 'L. Messi',    club: 'FC Barcelona', kit: 'Home Kit',  year: '2011', tag: 'Treble Kit',  img: '/assets/jersey_product2.png' },
-  { id: 3, player: 'Zidane',      club: 'France NT',   kit: 'Home Kit',  year: '2006', tag: 'WC Final',    img: '/assets/jersey_hero.png'     },
-  { id: 4, player: 'Giggs',       club: 'Man United',   kit: 'Treble Kit',year: '1999', tag: 'Treble',      img: '/assets/jersey_product1.png' },
+  { id: 0, player: 'Ronaldinho',  club: 'Brazil 2002',  kit: 'Away Kit',  year: '2002', img: '/assets/jersey_product3.png' },
+  { id: 1, player: 'C. Ronaldo',  club: 'Man United',   kit: 'Home Kit',  year: '2008', img: '/assets/jersey_product1.png' },
+  { id: 2, player: 'L. Messi',    club: 'FC Barcelona', kit: 'Home Kit',  year: '2011', img: '/assets/jersey_product2.png' },
+  { id: 3, player: 'Zidane',      club: 'France NT',    kit: 'Home Kit',  year: '2006', img: '/assets/jersey_hero.png'    },
+  { id: 4, player: 'Giggs',       club: 'Man United',   kit: 'Treble Kit',year: '1999', img: '/assets/jersey_product1.png' },
 ]
 
-/* Stack offsets (horizontal fan layout) */
+/* ─── Stack layout ─────────────────────────────────────────────────
+   Front card is large and dominant.
+   Background cards fan out to the right, filling the right half.
+   The last card may bleed off the viewport edge (clipped by section overflow-hidden). */
 const OFFSETS = [
-  { x: 0,   scale: 1,    z: 5 },
-  { x: 130, scale: 0.92, z: 4 },
-  { x: 240, scale: 0.84, z: 3 },
-  { x: 330, scale: 0.76, z: 2 },
-  { x: 400, scale: 0.68, z: 1 },
+  { x: 0,   scale: 1,    opacity: 1,   z: 5 },
+  { x: 145, scale: 0.90, opacity: 1,   z: 4 },
+  { x: 272, scale: 0.81, opacity: 1,   z: 3 },
+  { x: 382, scale: 0.72, opacity: 0.9, z: 2 },
+  { x: 476, scale: 0.63, opacity: 0.8, z: 1 },
 ]
 
-const CARD_W = 340
-const CARD_H = 480
+const CARD_W = 370   // larger front card width
+const CARD_H = 570   // larger front card height
 
-/* ─── Individual card face ─────────────────────────────────────────── */
-function JerseyCard({ jersey, isFront, originalIndex }: { jersey: Jersey; isFront: boolean; originalIndex: number }) {
+/* ─── Card face ─────────────────────────────────────────────────── */
+function JerseyCard({
+  jersey,
+  isFront,
+  posIdx,
+}: {
+  jersey: Jersey
+  isFront: boolean
+  posIdx: number
+}) {
   return (
     <div
-      className="relative w-full h-full rounded-[24px] overflow-hidden flex flex-col transition-colors duration-500"
+      className="relative w-full h-full rounded-[22px] overflow-hidden flex flex-col"
       style={{
-        background: isFront ? 'linear-gradient(180deg, #c0b7ab 0%, #514f4a 100%)' : 'linear-gradient(180deg, #1f1f1f 0%, #0a0a0a 100%)',
-        border: '1px solid rgba(255,255,255,0.08)',
+        background: isFront
+          ? 'linear-gradient(170deg, #b8b0a3 0%, #5a5650 100%)'
+          : 'linear-gradient(170deg, #1e1e1e 0%, #0c0c0c 100%)',
+        border: '1px solid rgba(255,255,255,0.07)',
         boxShadow: isFront
-          ? '0 30px 60px rgba(0,0,0,0.6), 0 0 40px rgba(182,245,66,0.1)'
-          : '0 20px 40px rgba(0,0,0,0.8)',
+          ? '0 32px 72px rgba(0,0,0,0.75), 0 0 0 1px rgba(182,245,66,0.12)'
+          : '0 16px 40px rgba(0,0,0,0.9)',
       }}
     >
-      {/* Top Bar */}
-      <div className="absolute top-6 left-7 right-6 flex justify-between items-start z-10">
-        <span className="text-[10px] tracking-[0.2em] font-medium" style={{ color: isFront ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)' }}>
-          0{originalIndex + 1} / 05
+      {/* Top bar */}
+      <div className="absolute top-5 left-6 right-5 flex justify-between items-start z-10">
+        <span
+          className="text-[10px] tracking-[0.22em] font-semibold"
+          style={{ color: isFront ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)' }}
+        >
+          0{posIdx + 1}&nbsp;/&nbsp;05
         </span>
         {isFront && (
-          <div className="bg-[#b6f542] text-black text-[9px] font-black uppercase px-2.5 py-1.5 rounded text-right leading-[1.2] tracking-wide shadow-[0_4px_12px_rgba(182,245,66,0.3)]">
-            NEW DROP<br/>AW 2024
+          <div className="bg-[#b6f542] text-black text-[8px] font-black uppercase px-2 py-1.5 rounded text-right leading-[1.3] tracking-wider shadow-[0_4px_14px_rgba(182,245,66,0.35)]">
+            NEW DROP
+            <br />
+            AW 2024
           </div>
         )}
       </div>
 
-      {/* Image area */}
-      <div className="flex-1 relative w-full mt-14 mb-24 flex items-center justify-center">
+      {/* Jersey image */}
+      <div className="flex-1 relative w-full mt-14 mb-28">
         <Image
           src={jersey.img}
           alt={jersey.player}
           fill
-          className="object-contain p-8 drop-shadow-2xl"
-          sizes="340px"
+          className="object-contain p-6 drop-shadow-2xl"
+          sizes="370px"
           priority={isFront}
         />
       </div>
 
-      {/* Bottom Info */}
-      <div className="absolute bottom-7 left-7 right-7 flex items-end justify-between z-10">
+      {/* Bottom info */}
+      <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between z-10">
         <div>
-          <span className="block text-[9px] tracking-[0.2em] uppercase mb-1.5 font-medium" style={{ color: isFront ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.3)' }}>
+          <span
+            className="block text-[9px] tracking-[0.2em] uppercase mb-1 font-semibold"
+            style={{ color: isFront ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.25)' }}
+          >
             {jersey.player}
           </span>
-          <h3 className="text-[26px] font-bold text-white leading-[1.15] tracking-tight">
+          <h3 className="text-[22px] font-bold text-white leading-[1.15] tracking-tight">
             {jersey.club}
             <br />
             {jersey.kit}
           </h3>
-          <span className="block text-[8.5px] tracking-[0.2em] uppercase mt-3 font-medium" style={{ color: isFront ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)' }}>
-            {jersey.year} • ICONIC SEASON
+          <span
+            className="block text-[8px] tracking-[0.2em] uppercase mt-2 font-medium"
+            style={{ color: isFront ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.18)' }}
+          >
+            {jersey.year} · ICONIC SEASON
           </span>
         </div>
 
-        {/* Arrow icon */}
         <div
-          className="w-10 h-10 rounded-full flex items-center justify-center border transition-all duration-500 flex-shrink-0"
-          style={{ borderColor: isFront ? '#b6f542' : 'rgba(255,255,255,0.15)' }}
+          className="w-9 h-9 rounded-full flex items-center justify-center border flex-shrink-0 transition-colors duration-500"
+          style={{ borderColor: isFront ? '#b6f542' : 'rgba(255,255,255,0.12)' }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isFront ? "#b6f542" : "rgba(255,255,255,0.5)"} strokeWidth="2.5">
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={isFront ? '#b6f542' : 'rgba(255,255,255,0.4)'}
+            strokeWidth="2.5"
+          >
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </div>
       </div>
 
-      {/* Dark overlay for inactive cards */}
+      {/* Subtle dark overlay for background cards — keeps jerseys visible */}
       {!isFront && (
-        <div className="absolute inset-0 bg-black/40 pointer-events-none transition-opacity duration-500" />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'rgba(0,0,0,0.18)' }}
+        />
       )}
     </div>
   )
 }
 
-/* ─── The stack ────────────────────────────────────────────────────── */
+/* ─── Stack controller ───────────────────────────────────────────── */
 export default function JerseyCardStack() {
-  /* orderRef holds the source of truth to avoid stale closures in intervals */
   const orderRef = useRef<number[]>([0, 1, 2, 3, 4])
   const [orderDisplay, setOrderDisplay] = useState<number[]>([0, 1, 2, 3, 4])
   const [exitingId, setExitingId] = useState<number | null>(null)
   const [freshBackId, setFreshBackId] = useState<number | null>(null)
 
   const locked = useRef(false)
-  const hoverIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const freshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const freshTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  /* ── Core cycle: swipe front card left, shift others forward ── */
   const cycle = useCallback(() => {
     if (locked.current) return
     locked.current = true
 
     const cur = orderRef.current
     const frontId = cur[0]
-
-    /* Kick off exit animation */
     setExitingId(frontId)
 
-    /* Rotate order immediately so background cards shift forward */
     const next = [...cur.slice(1), cur[0]]
     orderRef.current = next
     setOrderDisplay(next)
 
-    /* After exit anim finishes, snap the exited card to back position instantly */
-    if (exitTimerRef.current) clearTimeout(exitTimerRef.current)
-    exitTimerRef.current = setTimeout(() => {
+    if (exitTimer.current) clearTimeout(exitTimer.current)
+    exitTimer.current = setTimeout(() => {
       setFreshBackId(frontId)
       setExitingId(null)
       locked.current = false
-
-      if (freshTimerRef.current) clearTimeout(freshTimerRef.current)
-      freshTimerRef.current = setTimeout(() => setFreshBackId(null), 90)
-    }, 840)
+      if (freshTimer.current) clearTimeout(freshTimer.current)
+      freshTimer.current = setTimeout(() => setFreshBackId(null), 80)
+    }, 820)
   }, [])
 
-  /* ── Hover handlers ── */
   const startCycling = useCallback(() => {
     cycle()
-    hoverIntervalRef.current = setInterval(cycle, 2500)
+    intervalRef.current = setInterval(cycle, 2600)
   }, [cycle])
 
   const stopCycling = useCallback(() => {
-    if (hoverIntervalRef.current) {
-      clearInterval(hoverIntervalRef.current)
-      hoverIntervalRef.current = null
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
     }
   }, [])
 
-  /* Cleanup on unmount */
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       stopCycling()
-      if (exitTimerRef.current) clearTimeout(exitTimerRef.current)
-      if (freshTimerRef.current) clearTimeout(freshTimerRef.current)
-    }
-  }, [stopCycling])
+      if (exitTimer.current) clearTimeout(exitTimer.current)
+      if (freshTimer.current) clearTimeout(freshTimer.current)
+    },
+    [stopCycling]
+  )
 
-  /* ── Mouse tilt on front card ── */
-  const containerRef = useRef<HTMLDivElement>(null)
-  const frontCardRef = useRef<HTMLDivElement>(null)
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current || !frontCardRef.current || exitingId !== null) return
-    const rect = containerRef.current.getBoundingClientRect()
-    // Target the front card bounds approximately
-    const cx = rect.left + CARD_W / 2
-    const cy = rect.top + CARD_H / 2
-    const dx = (e.clientX - cx) / (CARD_W / 2)
-    const dy = (e.clientY - cy) / (CARD_H / 2)
-    
-    // Only tilt if mouse is roughly over the front card
-    if (Math.abs(dx) <= 1 && Math.abs(dy) <= 1) {
-      frontCardRef.current.style.transform = `perspective(800px) rotateY(${dx * 8}deg) rotateX(${-dy * 6}deg)`
-    }
-  }
-  const handleMouseLeaveCard = () => {
-    if (frontCardRef.current)
-      frontCardRef.current.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg)'
-  }
-
-  // Total container width = card width + max X offset (scaling starts from left)
-  const maxOffset = OFFSETS[OFFSETS.length - 1]
-  const CONTAINER_W = CARD_W * maxOffset.scale + maxOffset.x
+  /* Container width: front card + how far last card peeks out */
+  const lastOff = OFFSETS[OFFSETS.length - 1]
+  const CONTAINER_W = lastOff.x + CARD_W * lastOff.scale
 
   return (
     <div
-      ref={containerRef}
       className="relative select-none"
       style={{ width: CONTAINER_W, height: CARD_H }}
       onMouseEnter={startCycling}
-      onMouseLeave={() => { stopCycling(); handleMouseLeaveCard() }}
-      onMouseMove={handleMouseMove}
+      onMouseLeave={stopCycling}
     >
       {orderDisplay.map((jerseyId, posIdx) => {
         const pos = OFFSETS[posIdx]
@@ -214,48 +212,83 @@ export default function JerseyCardStack() {
         const isFreshBack = jerseyId === freshBackId && posIdx === orderDisplay.length - 1
         const isFront = posIdx === 0 && !isExiting
 
-        /* ── Exiting: fly left ── */
+        /* Exiting — slide left and fade */
         if (isExiting) {
           return (
             <motion.div
               key={`card-${jerseyId}`}
-              style={{ position: 'absolute', width: CARD_W, height: CARD_H, top: 0, left: 0, zIndex: 20, transformOrigin: 'left center' }}
+              style={{
+                position: 'absolute',
+                width: CARD_W,
+                height: CARD_H,
+                top: 0,
+                left: 0,
+                zIndex: 20,
+                transformOrigin: 'center center',
+              }}
               initial={false}
-              animate={{ x: -CARD_W - 40, opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.84, ease: EASE }}
+              animate={{ x: -(CARD_W + 60), opacity: 0, scale: 0.88 }}
+              transition={{ duration: 0.82, ease: EASE }}
             >
-              <JerseyCard jersey={JERSEYS[jerseyId]} isFront={false} originalIndex={jerseyId} />
+              <JerseyCard jersey={JERSEYS[jerseyId]} isFront={false} posIdx={posIdx} />
             </motion.div>
           )
         }
 
-        /* ── Just moved to back: instant snap, no animation ── */
+        /* Snapped back — no animation */
         if (isFreshBack) {
           return (
             <motion.div
               key={`card-${jerseyId}`}
-              style={{ position: 'absolute', width: CARD_W, height: CARD_H, top: 0, left: 0, zIndex: pos.z, transformOrigin: 'left center' }}
-              animate={{ x: pos.x, scale: pos.scale, opacity: 1 }}
+              style={{
+                position: 'absolute',
+                width: CARD_W,
+                height: CARD_H,
+                top: 0,
+                left: 0,
+                zIndex: pos.z,
+              }}
+              animate={{ x: pos.x, scale: pos.scale, opacity: pos.opacity }}
               transition={{ duration: 0 }}
             >
-              <JerseyCard jersey={JERSEYS[jerseyId]} isFront={false} originalIndex={jerseyId} />
+              <JerseyCard jersey={JERSEYS[jerseyId]} isFront={false} posIdx={posIdx} />
             </motion.div>
           )
         }
 
-        /* ── Normal stack card ── */
+        /* Normal */
         return (
           <motion.div
             key={`card-${jerseyId}`}
-            ref={isFront ? frontCardRef : undefined}
-            style={{ position: 'absolute', width: CARD_W, height: CARD_H, top: 0, left: 0, zIndex: pos.z, transformOrigin: 'left center', transition: 'transform 0.25s ease' }}
-            animate={{ x: pos.x, scale: pos.scale, opacity: 1 }}
-            transition={{ duration: 0.72, ease: EASE }}
+            style={{
+              position: 'absolute',
+              width: CARD_W,
+              height: CARD_H,
+              top: 0,
+              left: 0,
+              zIndex: pos.z,
+            }}
+            animate={{ x: pos.x, scale: pos.scale, opacity: pos.opacity }}
+            transition={{ duration: 0.7, ease: EASE }}
           >
-            <JerseyCard jersey={JERSEYS[jerseyId]} isFront={isFront} originalIndex={jerseyId} />
+            <JerseyCard jersey={JERSEYS[jerseyId]} isFront={isFront} posIdx={posIdx} />
           </motion.div>
         )
       })}
+
+      {/* Green glow under front card */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          bottom: -14,
+          left: CARD_W * 0.1,
+          width: CARD_W * 0.6,
+          height: 22,
+          background: 'rgba(182,245,66,0.22)',
+          filter: 'blur(18px)',
+          borderRadius: '50%',
+        }}
+      />
     </div>
   )
 }

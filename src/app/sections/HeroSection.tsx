@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import Image from 'next/image'
 import { motion, useMotionValue, useTransform } from 'framer-motion'
 import MagneticButton from '@/components/MagneticButton'
 import JerseyCardStack from '@/components/JerseyCardStack'
@@ -125,23 +124,6 @@ function Particles() {
 
 /* ── Hero Section ─────────────────────────────────── */
 export default function HeroSection() {
-  const jerseyRef = useRef<HTMLDivElement>(null)
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (!jerseyRef.current) return
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    const cx = rect.left + rect.width / 2
-    const cy = rect.top  + rect.height / 2
-    const dx = (e.clientX - cx) / rect.width
-    const dy = (e.clientY - cy) / rect.height
-    jerseyRef.current.style.transform = `perspective(1000px) rotateY(${dx * 14}deg) rotateX(${-dy * 10}deg)`
-  }
-
-  const handleMouseLeave = () => {
-    if (!jerseyRef.current) return
-    jerseyRef.current.style.transform = ''
-  }
-
   const titleLines = ['WEAR', 'FOOTBALL', 'HISTORY.']
 
   const stats = [
@@ -154,23 +136,31 @@ export default function HeroSection() {
     <section
       id="hero"
       className="relative min-h-screen bg-[#0a0a0a] flex items-center overflow-hidden"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
     >
       <FlowCanvas />
       <Particles />
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent z-[2] pointer-events-none" />
+      {/* Gradient — fades only the left third so cards stay sharp */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-[2] pointer-events-none" />
 
-      {/* Content */}
-      <div className="relative z-[3] w-full flex flex-col lg:flex-row items-center gap-12 px-6 md:px-16 pt-24 pb-16">
+      {/*
+       * LAYOUT: 2-column grid
+       *   Left  col: 44% — headline + copy + CTAs
+       *   Right col: 56% — card stack starting immediately after the gutter
+       *
+       * Using a grid instead of flex so the left column can never crush the headline.
+       */}
+      <div
+        className="relative z-[3] w-full grid pt-24 pb-16 px-8 md:px-14"
+        style={{ gridTemplateColumns: '44% 56%', minHeight: '100vh', alignItems: 'center' }}
+      >
 
-        {/* LEFT */}
-        <div className="flex-1 max-w-xl">
+        {/* ── LEFT: headline + content ─────────────────────────── */}
+        <div className="flex flex-col justify-center pr-8">
+
           {/* Eyebrow */}
           <motion.div
-            className="flex items-center gap-2.5 text-xs tracking-[0.18em] uppercase text-white/40 mb-8"
+            className="flex items-center gap-2.5 text-[11px] tracking-[0.2em] uppercase text-white/40 mb-7"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2.5, duration: 0.6 }}
@@ -179,16 +169,26 @@ export default function HeroSection() {
             Est. 1966 — Football Archive
           </motion.div>
 
-          {/* Title */}
-          <h1 className="text-[clamp(64px,10vw,130px)] font-black leading-[0.9] tracking-tight mb-8">
+          {/*
+           * Headline — fixed font size based on viewport so FOOTBALL never wraps or clips.
+           * 8vw tops out at ~115px on 1440px screens; fine for the 44% column.
+           */}
+          <h1
+            className="font-black tracking-tight mb-7 leading-[0.88]"
+            style={{ fontSize: 'clamp(52px, 7.5vw, 118px)' }}
+          >
             {titleLines.map((line, i) => (
               <motion.span
                 key={line}
-                className={`block overflow-hidden ${i === 2 ? 'italic text-white/70 font-light' : 'text-white'}`}
+                className={`block whitespace-nowrap ${
+                  i === 2
+                    ? 'italic text-white/65 font-light'
+                    : 'text-white'
+                }`}
                 style={{ fontFamily: i === 2 ? 'DM Serif Display, serif' : undefined }}
-                initial={{ y: '100%', opacity: 0 }}
+                initial={{ y: '110%', opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 2.6 + i * 0.15, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ delay: 2.6 + i * 0.14, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
               >
                 {line}
               </motion.span>
@@ -197,8 +197,8 @@ export default function HeroSection() {
 
           {/* Subtext */}
           <motion.p
-            className="text-[clamp(15px,1.5vw,18px)] leading-[1.9] text-white/40 font-light mb-12"
-            initial={{ opacity: 0, y: 20 }}
+            className="text-[15px] leading-[1.95] text-white/38 font-light mb-10"
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 3.1, duration: 0.8 }}
           >
@@ -207,27 +207,27 @@ export default function HeroSection() {
             Authentic football culture.
           </motion.p>
 
-          {/* Buttons */}
+          {/* CTAs */}
           <motion.div
-            className="flex flex-wrap gap-4 mb-16"
-            initial={{ opacity: 0, y: 20 }}
+            className="flex flex-wrap gap-4 mb-14"
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 3.25, duration: 0.7 }}
           >
             <MagneticButton
               id="hero-shop"
               onClick={() => document.getElementById('bestsellers')?.scrollIntoView({ behavior: 'smooth' })}
-              className="inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-[#b6f542] text-black font-bold text-base hover:-translate-y-1 hover:shadow-[0_12px_36px_rgba(182,245,66,0.45)] transition-all duration-300 overflow-hidden relative group"
+              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#b6f542] text-black font-bold text-[15px] hover:-translate-y-1 hover:shadow-[0_12px_36px_rgba(182,245,66,0.45)] transition-all duration-300 overflow-hidden relative group"
             >
               <span className="relative z-10">Shop Collection</span>
-              <svg className="relative z-10" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              <svg className="relative z-10" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               <span className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]" />
             </MagneticButton>
 
             <MagneticButton
               id="hero-explore"
               onClick={() => document.getElementById('players')?.scrollIntoView({ behavior: 'smooth' })}
-              className="inline-flex items-center gap-2.5 px-8 py-4 rounded-full border border-white/25 text-white font-semibold text-base hover:border-white/60 hover:bg-white/5 hover:-translate-y-0.5 transition-all duration-300"
+              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full border border-white/25 text-white font-semibold text-[15px] hover:border-white/55 hover:bg-white/5 hover:-translate-y-0.5 transition-all duration-300"
             >
               Explore Legends
             </MagneticButton>
@@ -243,7 +243,7 @@ export default function HeroSection() {
             {stats.map((s, i) => (
               <div key={s.label} className="flex items-center gap-8">
                 <div className="text-center">
-                  <div className="text-3xl font-black text-white tracking-tight tabular-nums">
+                  <div className="text-[28px] font-black text-white tracking-tight tabular-nums">
                     <Counter target={s.num} suffix={s.suffix} />
                   </div>
                   <div className="text-[10px] tracking-[0.16em] uppercase text-white/35 mt-1">{s.label}</div>
@@ -254,16 +254,14 @@ export default function HeroSection() {
           </motion.div>
         </div>
 
-        {/* RIGHT — floating jersey stack */}
+        {/* ── RIGHT: card stack ─────────────────────────────────── */}
         <motion.div
-          className="flex-1 flex items-center justify-center relative w-full h-full"
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 2.8, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-center justify-start pl-4"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 2.8, duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="relative flex items-center justify-center lg:justify-end lg:pr-16 2xl:pr-32 w-full h-full perspective-[1200px]">
-            <JerseyCardStack />
-          </div>
+          <JerseyCardStack />
         </motion.div>
       </div>
 
