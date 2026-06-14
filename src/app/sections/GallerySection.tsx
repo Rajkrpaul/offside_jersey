@@ -17,7 +17,7 @@ export default function GallerySection() {
   return (
     <section id="gallery" className="py-32 px-6 md:px-16 bg-[#0a0a0a]">
       <ScrollReveal className="text-center mb-20">
-        <span className="block text-xs tracking-[0.2em] uppercase text-white/25 mb-4">08 — Culture</span>
+        <span className="block text-xs tracking-[0.2em] uppercase text-white/25 mb-4">05 - Culture</span>
         <h2 className="text-[clamp(48px,6vw,90px)] font-black leading-[0.92] tracking-tight text-white">
           Beyond{' '}
           <em className="font-normal" style={{ fontFamily: 'DM Serif Display, serif' }}>The Jersey</em>

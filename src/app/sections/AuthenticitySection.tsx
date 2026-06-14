@@ -47,7 +47,7 @@ export default function AuthenticitySection() {
   return (
     <section id="authenticity" className="py-32 px-6 md:px-16 bg-white">
       <ScrollReveal className="text-center mb-20">
-        <span className="block text-xs tracking-[0.2em] uppercase text-gray-400 mb-4">07 — Promise</span>
+        <span className="block text-xs tracking-[0.2em] uppercase text-gray-400 mb-4">04 - Promise</span>
         <h2 className="text-[clamp(48px,6vw,90px)] font-black leading-[0.92] tracking-tight">
           Why Collectors{' '}
           <em className="font-normal" style={{ fontFamily: 'DM Serif Display, serif' }}>Trust Us</em>

@@ -3,7 +3,6 @@ import HeroSection from './sections/HeroSection'
 import CollectionsSection from './sections/CollectionsSection'
 import EraSection from './sections/EraSection'
 import BestSellersSection from './sections/BestSellersSection'
-import LegendsSection from './sections/LegendsSection'
 import TrendingSection from './sections/TrendingSection'
 import AuthenticitySection from './sections/AuthenticitySection'
 import GallerySection from './sections/GallerySection'
@@ -25,7 +24,6 @@ export default function HomePage() {
       <CollectionsSection />
       <EraSection />
       <BestSellersSection />
-      <LegendsSection />
       <TrendingSection />
       <AuthenticitySection />
       <GallerySection />

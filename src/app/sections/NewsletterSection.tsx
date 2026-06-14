@@ -26,7 +26,7 @@ export default function NewsletterSection() {
 
       <div className="relative z-10 max-w-4xl mx-auto">
         <ScrollReveal>
-          <span className="block text-xs tracking-[0.2em] uppercase text-white/25 mb-8">09 — Stay Close</span>
+          <span className="block text-xs tracking-[0.2em] uppercase text-white/25 mb-8">06 - Stay Close</span>
         </ScrollReveal>
 
         {/* Huge title */}

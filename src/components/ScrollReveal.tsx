@@ -6,6 +6,7 @@ import { motion, useInView, type Variant } from 'framer-motion'
 interface ScrollRevealProps {
   children: ReactNode
   className?: string
+  style?: React.CSSProperties
   delay?: number
   direction?: 'up' | 'left' | 'right' | 'none'
   once?: boolean
@@ -33,6 +34,7 @@ const variants: Record<string, { hidden: Variant; visible: Variant }> = {
 export default function ScrollReveal({
   children,
   className = '',
+  style,
   delay = 0,
   direction = 'up',
   once = true,
@@ -44,6 +46,7 @@ export default function ScrollReveal({
     <motion.div
       ref={ref}
       className={className}
+      style={style}
       initial="hidden"
       animate={inView ? 'visible' : 'hidden'}
       variants={variants[direction]}
