@@ -2,7 +2,6 @@ import Navbar from '@/components/Navbar'
 import HeroSection from './sections/HeroSection'
 import CollectionsSection from './sections/CollectionsSection'
 import EraSection from './sections/EraSection'
-import BestSellersSection from './sections/BestSellersSection'
 import TrendingSection from './sections/TrendingSection'
 import AuthenticitySection from './sections/AuthenticitySection'
 import GallerySection from './sections/GallerySection'
@@ -23,7 +22,6 @@ export default function HomePage() {
       <HeroSection />
       <CollectionsSection />
       <EraSection />
-      <BestSellersSection />
       <TrendingSection />
       <AuthenticitySection />
       <GallerySection />
