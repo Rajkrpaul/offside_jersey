@@ -1,132 +1,354 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
-import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ScrollReveal from '@/components/ScrollReveal'
 
-const legends = [
-  { id: 'messi',      name: 'Lionel Messi',      years: '2004 — 2025', stats: ['8× Ballon d\'Or', '42 Jerseys'], imgs: ['/assets/legends/messi-1.jpg', '/assets/legends/messi-2.jpg', '/assets/legends/messi-3.jpg'] },
-  { id: 'ronaldo',    name: 'Cristiano Ronaldo',  years: '2002 — 2024', stats: ['5× Ballon d\'Or', '38 Jerseys'], imgs: ['/assets/legends/ronaldo-1.jpg', '/assets/legends/ronaldo-2.jpg', '/assets/legends/ronaldo-3.jpg'] },
-  { id: 'zidane',     name: 'Zinedine Zidane',    years: '1989 — 2006', stats: ['World Cup 98',   '22 Jerseys'], imgs: ['/assets/legends/zidane-1.jpg', '/assets/legends/zidane-2.jpg', '/assets/legends/zidane-3.jpg'] },
-  { id: 'beckham',    name: 'David Beckham',      years: '1993 — 2013', stats: ['Cultural Icon',   '28 Jerseys'], imgs: ['/assets/legends/beckham-1.jpg', '/assets/legends/beckham-2.jpg', '/assets/legends/beckham-3.jpg'] },
-  { id: 'ronaldinho', name: 'Ronaldinho',           years: '1998 — 2015', stats: ['Ballon d\'Or 05','31 Jerseys'], imgs: ['/assets/legends/ronaldinho-1.jpg', '/assets/legends/ronaldinho-2.jpg', '/assets/legends/ronaldinho-3.jpg'] },
-  { id: 'maldini',    name: 'Paolo Maldini',       years: '1985 — 2009', stats: ['5× UCL',         '19 Jerseys'], imgs: ['/assets/legends/maldini-1.jpg', '/assets/legends/maldini-2.jpg', '/assets/legends/maldini-3.jpg'] },
+/* ─── Data ──────────────────────────────────────────────────────────── */
+interface Legend {
+  id: string
+  name: string
+  years: string
+  jerseys: string
+  no: string
+  imgs: string[]
+  orientation: 'vertical' | 'horizontal'
+}
+
+const LEGENDS: Legend[] = [
+  {
+    id: 'neymar',
+    name: 'Neymar Jr',
+    years: '2010 — 2025',
+    jerseys: '24 Jerseys',
+    no: '01',
+    imgs: ['/assets/legends/neymar1.jpg', '/assets/legends/neymar2.jpg', '/assets/legends/neymar3.jpg'],
+    orientation: 'vertical',
+  },
+  {
+    id: 'ronaldo',
+    name: 'Ronaldo',
+    years: '2003 — 2023',
+    jerseys: '38 Jerseys',
+    no: '02',
+    imgs: ['/assets/legends/ronaldo1.jpg', '/assets/legends/ronaldo2.jpg', '/assets/legends/ronaldo3.jpg'],
+    orientation: 'vertical',
+  },
+  {
+    id: 'messi',
+    name: 'Messi',
+    years: '2004 — 2025',
+    jerseys: '42 Jerseys',
+    no: '03',
+    imgs: ['/assets/legends/messi1.jpg', '/assets/legends/messi2.jpg', '/assets/legends/messi3.jpg'],
+    orientation: 'horizontal',
+  },
+  {
+    id: 'beckham',
+    name: 'Beckham',
+    years: '1992 — 2013',
+    jerseys: '27 Jerseys',
+    no: '04',
+    imgs: ['/assets/legends/beckham1.jpg', '/assets/legends/beckham2.jpg', '/assets/legends/beckham3.jpg'],
+    orientation: 'horizontal',
+  },
+  {
+    id: 'zidane',
+    name: 'Zidane',
+    years: '1991 — 2006',
+    jerseys: '18 Jerseys',
+    no: '05',
+    imgs: ['/assets/legends/zidane1.jpg', '/assets/legends/zidane2.jpg', '/assets/legends/zidane3.jpg'],
+    orientation: 'horizontal',
+  },
+  {
+    id: 'ronaldinho',
+    name: 'Ronaldinho',
+    years: '1998 — 2015',
+    jerseys: '24 Jerseys',
+    no: '06',
+    imgs: ['/assets/legends/ronaldinho1.jpg', '/assets/legends/ronaldinho2.jpg', '/assets/legends/ronaldinho3.jpg'],
+    orientation: 'horizontal',
+  },
+  {
+    id: 'worldcup',
+    name: 'World Cup Classics',
+    years: '1930 — 2022',
+    jerseys: '15 Collections',
+    no: '07',
+    imgs: ['/assets/legends/world%20cup.jpg', '/assets/legends/world%20cup.jpg', '/assets/legends/world%20cup.jpg'],
+    orientation: 'horizontal',
+  },
 ]
 
-export default function LegendsSection() {
-  const trackRef = useRef<HTMLDivElement>(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const startX = useRef(0)
-  const scrollLeft = useRef(0)
+/* ─── Arrow ────────────────────────────────────────────────────────── */
+function Arrow() {
+  return (
+    <div className="w-8 h-8 rounded-full border border-[#b6f542] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b6f542] transition-all duration-300">
+      <svg
+        width="13"
+        height="13"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#b6f542"
+        strokeWidth="2.5"
+        className="group-hover:stroke-black transition-all duration-300"
+      >
+        <path d="M5 12h14M12 5l7 7-7 7" />
+      </svg>
+    </div>
+  )
+}
 
-  // Cycler for images
+/* ─── Cycling background image card ────────────────────────────────── */
+function LegendCard({
+  legend,
+  style,
+  animDelay = 0,
+  textSize = 'md',
+}: {
+  legend: Legend
+  style?: React.CSSProperties
+  animDelay?: number
+  textSize?: 'sm' | 'md' | 'lg'
+}) {
   const [imgIdx, setImgIdx] = useState(0)
-  useEffect(() => {
-    const int = setInterval(() => setImgIdx((v) => (v + 1) % 3), 3000)
-    return () => clearInterval(int)
-  }, [])
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    if (!trackRef.current) return
-    setIsDragging(true)
-    startX.current = e.pageX - trackRef.current.offsetLeft
-    scrollLeft.current = trackRef.current.scrollLeft
-  }
-  const onMouseLeave = () => setIsDragging(false)
-  const onMouseUp = () => setIsDragging(false)
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !trackRef.current) return
-    e.preventDefault()
-    const x = e.pageX - trackRef.current.offsetLeft
-    const walk = (x - startX.current) * 1.4
-    trackRef.current.scrollLeft = scrollLeft.current - walk
-  }
+  useEffect(() => {
+    // stagger starts so all cards don't flip at the same time
+    const startDelay = setTimeout(
+      () => {
+        const id = setInterval(() => setImgIdx((v) => (v + 1) % legend.imgs.length), 3500)
+        return () => clearInterval(id)
+      },
+      animDelay * 1200
+    )
+    return () => clearTimeout(startDelay)
+  }, [legend.imgs, animDelay])
+
+  const nameSize =
+    textSize === 'lg'
+      ? 'text-[42px]'
+      : textSize === 'sm'
+      ? 'text-[20px]'
+      : 'text-[28px]'
 
   return (
-    <section id="players" className="py-32 bg-white overflow-hidden">
-      <ScrollReveal className="text-center mb-16 px-6 md:px-16">
-        <span className="block text-xs tracking-[0.2em] uppercase text-gray-400 mb-4">05 — Legends</span>
-        <h2 className="text-[clamp(48px,6vw,90px)] font-black leading-[0.92] tracking-tight">
-          The{' '}
-          <em className="font-normal" style={{ fontFamily: 'DM Serif Display, serif' }}>Icons</em>
-        </h2>
-      </ScrollReveal>
+    <motion.div
+      className="relative rounded-2xl overflow-hidden cursor-pointer group"
+      style={{ background: '#111', ...style }}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: animDelay * 0.1 }}
+      whileHover={{ scale: 1.015 }}
+    >
+      {/* Cycling background images */}
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={imgIdx}
+          className="absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.2, ease: 'easeInOut' }}
+          style={{
+            backgroundImage: `url(${legend.imgs[imgIdx]})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top',
+          }}
+        />
+      </AnimatePresence>
 
-      {/* Drag scroll track */}
+      {/* Bottom gradient overlay */}
       <div
-        ref={trackRef}
-        className={`flex gap-6 px-6 md:px-16 pb-10 overflow-x-auto no-scrollbar select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-        onMouseDown={onMouseDown}
-        onMouseLeave={onMouseLeave}
-        onMouseUp={onMouseUp}
-        onMouseMove={onMouseMove}
-      >
-        {legends.map((legend, i) => (
-          <motion.div
-            key={legend.id}
-            className="flex-shrink-0 w-[clamp(320px,32vw,400px)] rounded-2xl overflow-hidden bg-[#0a0a0a] group flex flex-col"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '0px 0px -80px 0px' }}
-            transition={{ delay: i * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            whileHover={{ y: -8 }}
-          >
-            {/* Image Box */}
-            <div className="relative h-[420px] overflow-hidden bg-black/5">
-              <AnimatePresence initial={false}>
-                <motion.div
-                  key={imgIdx}
-                  className="absolute inset-0"
-                  initial={{ opacity: 0, scale: 1.05 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <Image
-                    src={legend.imgs[imgIdx]}
-                    alt={`${legend.name} photo`}
-                    fill
-                    className="object-cover transition-all duration-700 group-hover:[filter:grayscale(0%)] [filter:grayscale(100%)_contrast(1.1)]"
-                    draggable={false}
-                    sizes="(max-width: 768px) 80vw, 30vw"
-                  />
-                </motion.div>
-              </AnimatePresence>
-              {/* Gradient overlay for better blend with bottom section */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/20 to-transparent" />
-            </div>
+        className="absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0) 100%)',
+        }}
+      />
 
-            {/* Info Box */}
-            <div className="bg-[#0a0a0a] p-7 pt-4 flex-1 flex flex-col justify-between">
-              <div>
-                <span className="text-[11px] tracking-[0.16em] uppercase text-white/30 block mb-2">{legend.years}</span>
-                <h3 className="text-[clamp(28px,2.5vw,36px)] font-black text-white tracking-tight leading-[1.05] mb-5">
-                  {legend.name}
-                </h3>
-                <div className="flex gap-2 flex-wrap mb-6">
-                  {legend.stats.map((s) => (
-                    <span key={s} className="text-[11px] font-medium text-white/40 border border-white/[0.08] rounded-full px-3 py-1.5">{s}</span>
-                  ))}
-                </div>
-              </div>
-              <button
-                id={`legend-${legend.id}`}
-                className="w-full py-4 rounded-full border border-white/15 text-white text-sm font-semibold hover:border-[#b6f542] hover:bg-[#b6f542] hover:text-black transition-all duration-300 tracking-wide mt-auto"
-              >
-                View Collection
-              </button>
-            </div>
-          </motion.div>
+      {/* Card number — top left */}
+      <span className="absolute top-5 left-5 text-[10px] tracking-[0.22em] text-white/55 font-semibold z-10">
+        {legend.no}
+      </span>
+
+      {/* Info — bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+        <p className="text-[9px] tracking-[0.2em] uppercase text-[#b6f542] font-semibold mb-1.5">
+          {legend.jerseys}
+        </p>
+        <h3 className={`font-black text-white leading-[1] tracking-tight mb-1 ${nameSize}`}>
+          {legend.name}
+        </h3>
+        <p className="text-[10px] text-white/45 tracking-widest mb-4">{legend.years}</p>
+        <Arrow />
+      </div>
+    </motion.div>
+  )
+}
+
+/* ─── More Legends Bar ──────────────────────────────────────────────── */
+function MoreLegendsBar() {
+  const faces = [
+    '/assets/legends/maldini-1.jpg',
+    '/assets/legends/ronaldinho1.jpg',
+    '/assets/legends/beckham1.jpg',
+    '/assets/legends/zidane1.jpg',
+    '/assets/legends/maldini-2.jpg',
+    '/assets/legends/messi1.jpg',
+  ]
+
+  return (
+    <motion.div
+      className="relative rounded-2xl overflow-hidden cursor-pointer group mt-3"
+      style={{ height: 130, background: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)' }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.6 }}
+      whileHover={{ scale: 1.005 }}
+    >
+      {/* Face strip */}
+      <div className="absolute inset-0 flex">
+        {faces.map((src, i) => (
+          <div
+            key={i}
+            className="flex-1 relative"
+            style={{
+              backgroundImage: `url(${src})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center top',
+              filter: 'grayscale(1)',
+              opacity: 0.35,
+            }}
+          />
         ))}
       </div>
 
-      {/* Drag hint */}
-      <div className="flex items-center justify-center gap-2 text-xs tracking-[0.1em] uppercase text-gray-300 mt-2">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        Drag to explore
+      {/* Gradient mask */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(to right, rgba(14,14,14,1) 0%, rgba(14,14,14,0.55) 30%, rgba(14,14,14,0.2) 70%, rgba(14,14,14,0.15) 100%)',
+        }}
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(to top, rgba(14,14,14,0.8) 0%, transparent 100%)',
+        }}
+      />
+
+      {/* Text */}
+      <div className="relative z-10 flex items-center gap-6 h-full px-7">
+        <span className="text-[10px] tracking-[0.2em] font-semibold text-white/40">08</span>
+        <div>
+          <h3 className="text-[28px] font-black text-white tracking-tight leading-[1]">More Legends</h3>
+          <p className="text-[11px] text-white/35 mt-1">100+ legendary players. Endless stories.</p>
+        </div>
+        <div className="ml-3">
+          <Arrow />
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+/* ─── Section ───────────────────────────────────────────────────────── */
+export default function LegendsSection() {
+  const [neymar, ronaldo, messi, beckham, zidane, ronaldinho, worldcup] = LEGENDS
+
+  return (
+    <section id="players" className="py-24 bg-[#0a0a0a]">
+      {/* Header */}
+      <ScrollReveal className="text-center mb-12 px-6">
+        <span className="block text-[11px] tracking-[0.25em] uppercase text-white/35 mb-5">
+          02 — Collections
+        </span>
+        <h2 className="text-[clamp(40px,5.5vw,82px)] font-black leading-[0.92] tracking-tight text-white">
+          Discover{' '}
+          <em className="font-normal italic" style={{ fontFamily: 'DM Serif Display, serif' }}>
+            The Legends
+          </em>
+        </h2>
+        <p className="text-[15px] text-white/35 mt-5 font-light tracking-wide">
+          Iconic players. Legendary moments. Timeless jerseys.
+        </p>
+      </ScrollReveal>
+
+      {/* Bento Grid */}
+      <div className="px-6 md:px-10 max-w-[1400px] mx-auto">
+        {/*
+         * Layout:
+         *  ┌──────────┬──────────┬────────────────────────────────┐
+         *  │          │          │  Messi  (tall ~170px)          │
+         *  │ Neymar   │ Ronaldo  ├─────────────────┬──────────────┤
+         *  │ vertical │ vertical │  Beckham        │  Zidane      │
+         *  │          │          ├─────────────────┼──────────────┤
+         *  │          │          │  Ronaldinho     │  World Cup   │
+         *  └──────────┴──────────┴─────────────────┴──────────────┘
+         */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 2fr',
+            gridTemplateRows: '560px',
+            gap: 12,
+          }}
+        >
+          {/* Neymar — full-height vertical */}
+          <LegendCard
+            legend={neymar}
+            animDelay={0}
+            textSize="lg"
+            style={{ height: '100%' }}
+          />
+
+          {/* Ronaldo — full-height vertical */}
+          <LegendCard
+            legend={ronaldo}
+            animDelay={1}
+            textSize="lg"
+            style={{ height: '100%' }}
+          />
+
+          {/* Right column: nested 3-row grid */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateRows: '1fr 185px 185px',
+              gap: 12,
+              height: '100%',
+            }}
+          >
+            {/* Messi — wide tall top */}
+            <LegendCard
+              legend={messi}
+              animDelay={2}
+              textSize="lg"
+              style={{ height: '100%' }}
+            />
+
+            {/* Beckham + Zidane — row 2 */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, height: '100%' }}>
+              <LegendCard legend={beckham} animDelay={3} textSize="sm" style={{ height: '100%' }} />
+              <LegendCard legend={zidane} animDelay={4} textSize="sm" style={{ height: '100%' }} />
+            </div>
+
+            {/* Ronaldinho + World Cup — row 3 */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, height: '100%' }}>
+              <LegendCard legend={ronaldinho} animDelay={5} textSize="sm" style={{ height: '100%' }} />
+              <LegendCard legend={worldcup} animDelay={6} textSize="sm" style={{ height: '100%' }} />
+            </div>
+          </div>
+        </div>
+
+        {/* More Legends */}
+        <MoreLegendsBar />
       </div>
     </section>
   )
 }
-
