@@ -302,7 +302,7 @@ export default function TrendingSection() {
   }
 
   return (
-    <section id="trending" className="bg-[#FFFFFF] py-[48px] px-6 md:px-[40px] relative">
+    <section id="trending" className="bg-[#FFFFFF] py-[96px] px-6 md:px-[40px] relative">
       
       <Toast message={toastMessage} />
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} removeFromCart={(i) => setCart(prev => prev.filter((_, idx) => idx !== i))} />
@@ -328,7 +328,10 @@ export default function TrendingSection() {
       </button>
 
       {/* ── Section Header ── */}
-      <ScrollReveal className="text-center mb-8">
+      <ScrollReveal className="text-center mb-[48px]">
+        <span className="block text-[11px] tracking-[0.25em] uppercase text-gray-400 font-semibold mb-[12px]">
+          02 — MOST WANTED
+        </span>
         <h2 className="text-[clamp(40px,5vw,72px)] font-black leading-[0.9] tracking-tight text-[#0a0a0a]">
           Most <em className="font-normal italic" style={{ fontFamily: 'DM Serif Display, serif' }}>Wanted</em>
         </h2>

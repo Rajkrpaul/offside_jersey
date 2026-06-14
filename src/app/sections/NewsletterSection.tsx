@@ -20,17 +20,19 @@ export default function NewsletterSection() {
   const titleWords = ['THE ARCHIVE', 'NEVER STOPS', 'GROWING.']
 
   return (
-    <section id="newsletter" className="relative py-[clamp(80px,12vw,180px)] px-6 md:px-16 bg-[#0a0a0a] overflow-hidden text-center">
+    <section id="newsletter" className="relative py-[80px] px-6 md:px-16 bg-[#0a0a0a] overflow-hidden text-center">
       {/* Radial glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[#b6f542]/[0.04] blur-[120px] pointer-events-none" />
 
       <div className="relative z-10 max-w-4xl mx-auto">
         <ScrollReveal>
-          <span className="block text-xs tracking-[0.2em] uppercase text-white/25 mb-8">06 - Stay Close</span>
+          <span className="block text-[11px] tracking-[0.25em] uppercase text-white/40 font-semibold mb-[12px]">
+            04 — STAY CLOSE
+          </span>
         </ScrollReveal>
 
         {/* Huge title */}
-        <div className="mb-12">
+        <div className="mb-[48px]">
           {titleWords.map((word, i) => (
             <ScrollReveal key={word} delay={i * 0.12} className="overflow-hidden">
               <h2

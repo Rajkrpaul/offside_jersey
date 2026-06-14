@@ -200,7 +200,7 @@ function MoreLegendsBanner() {
 /* ─── Section Layout ─────────────────────────────────────────────── */
 export default function CollectionsSection() {
   return (
-    <section id="collections" className="bg-[#FFFFFF] py-[48px] px-[40px]">
+    <section id="collections" className="bg-[#FFFFFF] py-[96px] px-[40px]">
       
       {/* ── Section Header ── */}
       <ScrollReveal className="text-center mb-[48px]">

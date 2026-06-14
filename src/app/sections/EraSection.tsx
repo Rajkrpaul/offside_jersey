@@ -141,12 +141,12 @@ function EraCard({
 /* ─── Section Layout ─────────────────────────────────────────────── */
 export default function EraSection() {
   return (
-    <section id="era" className="bg-[#FFFFFF] py-[48px] px-[40px]">
+    <section id="era" className="bg-[#FFFFFF] py-[96px] px-[40px]">
       
       {/* ── Section Header ── */}
       <ScrollReveal className="text-center mb-[48px]">
-        <span className="block text-[11px] tracking-[0.25em] uppercase text-gray-400 font-semibold mb-4">
-          02 — ERAS
+        <span className="block text-[11px] tracking-[0.25em] uppercase text-gray-400 font-semibold mb-[12px]">
+          01 — ERAS
         </span>
         <h2 className="text-[clamp(40px,5vw,72px)] font-black leading-[0.9] tracking-tight text-[#0a0a0a]">
           Shop By <em className="font-normal italic" style={{ fontFamily: 'DM Serif Display, serif' }}>Era</em>

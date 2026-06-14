@@ -4,7 +4,6 @@ import CollectionsSection from './sections/CollectionsSection'
 import EraSection from './sections/EraSection'
 import TrendingSection from './sections/TrendingSection'
 import AuthenticitySection from './sections/AuthenticitySection'
-import GallerySection from './sections/GallerySection'
 import NewsletterSection from './sections/NewsletterSection'
 import FooterSection from './sections/FooterSection'
 
@@ -24,7 +23,6 @@ export default function HomePage() {
       <EraSection />
       <TrendingSection />
       <AuthenticitySection />
-      <GallerySection />
       <NewsletterSection />
       <FooterSection />
     </main>
