@@ -29,14 +29,14 @@ const JERSEYS: Jersey[] = [
    The last card may bleed off the viewport edge (clipped by section overflow-hidden). */
 const OFFSETS = [
   { x: 0,   scale: 1,    opacity: 1,   z: 5 },
-  { x: 145, scale: 0.90, opacity: 1,   z: 4 },
-  { x: 272, scale: 0.81, opacity: 1,   z: 3 },
-  { x: 382, scale: 0.72, opacity: 0.9, z: 2 },
-  { x: 476, scale: 0.63, opacity: 0.8, z: 1 },
+  { x: 155, scale: 0.90, opacity: 1,   z: 4 },
+  { x: 295, scale: 0.80, opacity: 1,   z: 3 },
+  { x: 415, scale: 0.70, opacity: 0.9, z: 2 },
+  { x: 518, scale: 0.60, opacity: 0.8, z: 1 },
 ]
 
-const CARD_W = 370   // larger front card width
-const CARD_H = 570   // larger front card height
+const CARD_W = 410   // fills right column
+const CARD_H = 590   // tall premium card
 
 /* ─── Card face ─────────────────────────────────────────────────── */
 function JerseyCard({
@@ -85,7 +85,7 @@ function JerseyCard({
           alt={jersey.player}
           fill
           className="object-contain p-6 drop-shadow-2xl"
-          sizes="370px"
+          sizes="410px"
           priority={isFront}
         />
       </div>

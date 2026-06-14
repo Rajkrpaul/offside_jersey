@@ -18,7 +18,7 @@ export default function TrendingSection() {
   return (
     <section id="trending" className="py-32 px-6 md:px-16 bg-[#f5f5f5]">
       <ScrollReveal className="text-center mb-20">
-        <span className="block text-xs tracking-[0.2em] uppercase text-gray-400 mb-4">06 — Trending</span>
+        <span className="block text-xs tracking-[0.2em] uppercase text-gray-400 mb-4">05 — Trending</span>
         <h2 className="text-[clamp(48px,6vw,90px)] font-black leading-[0.92] tracking-tight text-[#0a0a0a]">
           What's{' '}
           <em className="font-normal" style={{ fontFamily: 'DM Serif Display, serif' }}>Moving</em>

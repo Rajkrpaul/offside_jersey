@@ -153,7 +153,7 @@ export default function BestSellersSection() {
   return (
     <section id="bestsellers" className="py-32 px-6 md:px-16 bg-white">
       <ScrollReveal className="text-center mb-20">
-        <span className="block text-xs tracking-[0.2em] uppercase text-gray-400 mb-4">04 — Best Sellers</span>
+        <span className="block text-xs tracking-[0.2em] uppercase text-gray-400 mb-4">03 — Best Sellers</span>
         <h2 className="text-[clamp(48px,6vw,90px)] font-black leading-[0.92] tracking-tight">
           Most{' '}
           <em className="font-normal" style={{ fontFamily: 'DM Serif Display, serif' }}>Wanted</em>

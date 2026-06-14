@@ -266,7 +266,7 @@ export default function LegendsSection() {
       {/* Header */}
       <ScrollReveal className="text-center mb-12 px-6">
         <span className="block text-[11px] tracking-[0.25em] uppercase text-white/35 mb-5">
-          02 — Collections
+          04 — Collections
         </span>
         <h2 className="text-[clamp(40px,5.5vw,82px)] font-black leading-[0.92] tracking-tight text-white">
           Discover{' '}
